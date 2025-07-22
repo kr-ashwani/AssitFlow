@@ -10,10 +10,12 @@ import com.github.krashwani.assitflow.mapper.SupportTicketMapper;
 import com.github.krashwani.assitflow.repository.CustomerRepository;
 import com.github.krashwani.assitflow.repository.SupportTicketRepository;
 import com.github.krashwani.assitflow.service.SupportTicketService;
+import com.github.krashwani.assitflow.specification.SupportTicketSpecification;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -50,7 +52,10 @@ public class SupportTicketServiceImpl implements SupportTicketService {
     public PaginatedResponseDTO<SupportTicketDTO> getAllTickets(TicketFilterRequestDTO ticketFilterRequestDTO){
         Sort sort = Sort.by(new Sort.Order(ticketFilterRequestDTO.getDirection(),ticketFilterRequestDTO.getSortBy()));
         PageRequest page = PageRequest.of(ticketFilterRequestDTO.getPage(),ticketFilterRequestDTO.getSize(),sort);
-        Page<SupportTicket> ticketsPage = supportTicketRepository.findAll(page);
-        return paginatedResponseMapper.convertPageToResponseDTO(ticketsPage,supportTicketMapper::toDto);
+
+        Specification<SupportTicket> spec = SupportTicketSpecification.build(ticketFilterRequestDTO);
+
+        Page<SupportTicket> ticketsPage = supportTicketRepository.findAll(spec,page);
+            return paginatedResponseMapper.convertPageToResponseDTO(ticketsPage,supportTicketMapper::toDto);
     }
 }

@@ -12,7 +12,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class  CustomerDTO {
-    private String id;
     @NotBlank(message = "Customer name cannot be null/blank")
     private String name;
     @NotBlank(message = "Customer email cannot be null/blank")

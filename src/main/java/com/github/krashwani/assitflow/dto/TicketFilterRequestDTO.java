@@ -28,10 +28,10 @@ public class TicketFilterRequestDTO {
     private int size = 10;
 
     @ValidEnum(enumClass = TicketStatus.class,includeNull = true)
-    private String status;
+    private TicketStatus status;
 
     @ValidEnum(enumClass = TicketPriority.class,includeNull = true)
-    private String priority;
+    private TicketPriority priority;
 
     @Pattern(regexp = "createdAt|updatedAt|priority|status|title",
             message = "Invalid sort field")

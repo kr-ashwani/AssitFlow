@@ -1,8 +1,11 @@
 package com.github.krashwani.assitflow.exception;
 
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.github.krashwani.assitflow.exception.apiError.BadRequestException;
 import com.github.krashwani.assitflow.exception.apiError.ResourceNotFoundException;
 import com.github.krashwani.assitflow.payload.ApiResponse;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -17,10 +20,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import jakarta.validation.ConstraintViolationException;
 import java.sql.SQLIntegrityConstraintViolationException;
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -50,18 +54,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
         log.warn("Validation failed: {}", ex.getMessage());
 
-        Map<String, String> fieldErrors = new HashMap<>();
-        ex.getBindingResult().getFieldErrors().forEach(error ->
-                fieldErrors.put(error.getField(), error.getDefaultMessage())
-        );
+        List<String> messages = new ArrayList<>();
 
-        // Enhanced error message formatting
-        String errorMessage = fieldErrors.entrySet().stream()
-                .map(entry -> String.format("'%s': %s", entry.getKey(), entry.getValue()))
-                .collect(Collectors.joining("; "));
+        ex.getBindingResult().getFieldErrors().forEach(error -> {
+            String field = error.getField();
+            String rejectedValue = error.getRejectedValue() == null ? "null" : error.getRejectedValue().toString();
+            String defaultMessage = error.getDefaultMessage();
+
+            messages.add(String.format("'%s': %s (rejected value: '%s')", field, defaultMessage, rejectedValue));
+        });
+
+        String errorMessage = "Validation failed: " + String.join("; ", messages);
 
         return ResponseEntity.badRequest().body(
-                ApiResponse.failure(ErrorCode.VALIDATION_FAILED, "Validation failed: " + errorMessage)
+                ApiResponse.failure(ErrorCode.VALIDATION_FAILED, errorMessage)
         );
     }
 
@@ -70,7 +76,8 @@ public class GlobalExceptionHandler {
         log.warn("Constraint violation: {}", ex.getMessage());
 
         String errorMessage = ex.getConstraintViolations().stream()
-                .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
+                .map(violation -> String.format("%s: %s (rejected value: '%s')",
+                        violation.getPropertyPath(), violation.getMessage(), violation.getInvalidValue()))
                 .collect(Collectors.joining("; "));
 
         return ResponseEntity.badRequest().body(
@@ -82,25 +89,47 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleJsonParseError(HttpMessageNotReadableException ex) {
         log.warn("JSON parse error: {}", ex.getMessage());
 
-        String userFriendlyMessage = "Invalid JSON format: please check your request body";
+        String message = "Invalid JSON format: please check your request body";
 
         Throwable rootCause = ex.getCause();
-        if (rootCause != null) {
+        if (rootCause instanceof InvalidFormatException ife) {
+            List<JsonMappingException.Reference> path = ife.getPath();
+            if (!path.isEmpty()) {
+                JsonMappingException.Reference ref = path.get(path.size() - 1);
+                String fieldName = ref.getFieldName();
+                Object invalidValue = ife.getValue();
+                Class<?> targetType = ife.getTargetType();
+
+                if (targetType.isEnum()) {
+                    Object[] enumValues = targetType.getEnumConstants();
+                    String allowed = Arrays.stream(enumValues)
+                            .map(Object::toString)
+                            .collect(Collectors.joining(", "));
+                    message = String.format(
+                            "Invalid value '%s' for field '%s'. Expected one of: [%s]",
+                            invalidValue, fieldName, allowed
+                    );
+                } else {
+                    message = String.format(
+                            "Invalid value '%s' for field '%s'. Expected type: %s",
+                            invalidValue, fieldName, targetType.getSimpleName()
+                    );
+                }
+            }
+        } else if (rootCause != null && rootCause.getMessage() != null) {
             String causeMsg = rootCause.getMessage();
 
-            if (causeMsg.contains("Cannot deserialize")) {
-                userFriendlyMessage = "Invalid field type: expected different data type for one or more fields";
-            } else if (causeMsg.contains("Unrecognized field")) {
-                userFriendlyMessage = "Unknown field detected: request contains unexpected field names";
+            if (causeMsg.contains("Unrecognized field")) {
+                message = "Unknown field detected in request JSON: contains unsupported field names";
             } else if (causeMsg.contains("Cannot construct instance")) {
-                userFriendlyMessage = "Invalid object structure: nested object format is incorrect";
+                message = "Invalid object structure: nested object format is incorrect";
             } else if (causeMsg.contains("required")) {
-                userFriendlyMessage = "Missing required field: one or more mandatory fields are missing";
+                message = "Missing required field: one or more mandatory fields are missing";
             }
         }
 
         return ResponseEntity.badRequest().body(
-                ApiResponse.failure(ErrorCode.BAD_REQUEST, userFriendlyMessage)
+                ApiResponse.failure(ErrorCode.BAD_REQUEST, message)
         );
     }
 
@@ -157,7 +186,6 @@ public class GlobalExceptionHandler {
 
         String message = "Data integrity violation";
 
-        // Check for common constraint violations
         if (ex.getCause() instanceof SQLIntegrityConstraintViolationException) {
             String rootMessage = ex.getRootCause().getMessage();
             if (rootMessage.contains("Duplicate entry")) {
@@ -166,7 +194,6 @@ public class GlobalExceptionHandler {
                 message = "Foreign key constraint violation: referenced record does not exist";
             }
         }
-
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(
                 ApiResponse.failure(ErrorCode.CONFLICT, message)
@@ -186,7 +213,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleGenericException(Exception ex) {
         log.error("Unexpected error occurred", ex);
 
-        boolean isDev = activeProfile.equalsIgnoreCase("dev");
+        boolean isDev = "dev".equalsIgnoreCase(activeProfile);
         String message = isDev ? ex.getMessage() : "An unexpected error occurred";
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
