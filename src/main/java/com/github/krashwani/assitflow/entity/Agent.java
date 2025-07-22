@@ -37,7 +37,7 @@ public class Agent extends Auditable{
             name = "t_agent_skills",
             joinColumns = @JoinColumn(name = "agent_id")
     )
-    private Set<String> skills;
+    private Set<String> skills = new HashSet<String>();
 
     @Override
     public final boolean equals(Object o) {

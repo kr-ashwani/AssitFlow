@@ -21,13 +21,13 @@ public class CustomerController {
     @PostMapping
     ApiResponse<String> createCustomer(@RequestBody @Valid CustomerDTO customerDTO){
         String customerId = customerService.createCustomer(customerDTO);
-        return ApiResponse.success(String.format("Customer with id %s created successfully!",customerId));
+        return ApiResponse.success(String.format("Customer with id '%s' created successfully!",customerId));
     }
 
     @GetMapping("/{customerId}")
     ApiResponse<CustomerDTO> getCustomerById(@PathVariable String customerId){
         CustomerDTO customerDTO = customerService.getCustomerById(customerId).orElseThrow(
-                ()-> new BadRequestException(String.format("Customer with id %s is not present.",customerId))
+                ()-> new BadRequestException(String.format("Customer id '%s' is not registered.",customerId))
         );
         return ApiResponse.success(customerDTO,"Customer is fetched successfully!");
     }

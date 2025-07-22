@@ -26,6 +26,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Transactional
+    @Override
     public String createCustomer(CustomerDTO customerDTO){
         Customer customer = customerMapper.toEntity(customerDTO);
         customerRepository.save(customer);
@@ -33,15 +34,17 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Transactional
+    @Override
     public Optional<CustomerDTO> getCustomerById(String customerId){
         Optional<Customer> customer = customerRepository.findById(customerId);
         return customer.map(customerMapper::toDto);
     }
 
     @Transactional
+    @Override
     public void updateCustomerAddress(String customerId, AddressDTO addressDTO){
         Customer customer = customerRepository.findById(customerId).orElseThrow(
-                ()->new BadRequestException(String.format("Customer with id %s is not registered",customerId)
+                ()->new BadRequestException(String.format("Customer id '%s' is not registered",customerId)
         ));
         customer.getAddress().setCurrent(false);
         customer.setAddress(addressMapper.toEntity(addressDTO));

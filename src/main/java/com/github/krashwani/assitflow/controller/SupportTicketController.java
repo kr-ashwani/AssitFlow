@@ -3,6 +3,7 @@ package com.github.krashwani.assitflow.controller;
 import com.github.krashwani.assitflow.dto.PaginatedResponseDTO;
 import com.github.krashwani.assitflow.dto.SupportTicketDTO;
 import com.github.krashwani.assitflow.dto.TicketFilterRequestDTO;
+import com.github.krashwani.assitflow.dto.TicketStatusDTO;
 import com.github.krashwani.assitflow.exception.apiError.BadRequestException;
 import com.github.krashwani.assitflow.payload.ApiResponse;
 import com.github.krashwani.assitflow.service.SupportTicketService;
@@ -21,15 +22,21 @@ public class SupportTicketController {
     @PostMapping
     ApiResponse<String> createTicket(@RequestBody @Valid SupportTicketDTO supportTicketDTO){
         String ticketId = supportTicketService.createTicket(supportTicketDTO);
-        return ApiResponse.success(String.format("Ticket with id %s created successfully!",ticketId));
+        return ApiResponse.success(String.format("Ticket with id '%s' created successfully!",ticketId));
     }
 
     @GetMapping("/{ticketId}")
     ApiResponse<SupportTicketDTO> getCustomerById(@PathVariable String ticketId){
         SupportTicketDTO supportTicketDTO = supportTicketService.getTicketById(ticketId).orElseThrow(
-                ()-> new BadRequestException(String.format("Ticket with id %s is not present.",ticketId))
+                ()-> new BadRequestException(String.format("Ticket id '%s' is not present.",ticketId))
         );
         return ApiResponse.success(supportTicketDTO,"Ticket is fetched successfully!");
+    }
+
+    @PatchMapping("/{ticketId}/status")
+    ApiResponse<String> updateCustomerStatus(@PathVariable String ticketId,@RequestBody @Valid TicketStatusDTO ticketStatusDTO){
+        supportTicketService.updateTicketStatus(ticketId,ticketStatusDTO);
+        return ApiResponse.success(String.format("Ticket id '%s' successfully updated with status '%s'",ticketId,ticketStatusDTO.getStatus()));
     }
 
     @GetMapping

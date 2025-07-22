@@ -26,6 +26,8 @@ public class SupportTicketDTO {
     private Set<@NotBlank(message = "Ticket Tag cannot be null/blank") String> tags;
     @ValidEnum(enumClass = PRIORITY.class, message = "Ticket priority type is invalid")
     private PRIORITY priority;
+    @ValidEnum(enumClass = TicketStatusDTO.STATUS.class, message = "Ticket priority type is invalid")
+    private TicketStatusDTO.STATUS status = TicketStatusDTO.STATUS.OPEN;
     @NotBlank(message = "Ticket customerId cannot be null/blank")
     private String customerId;
 }

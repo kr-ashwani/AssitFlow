@@ -13,13 +13,14 @@ public interface SupportTicketMapper {
 
     @IgnoreAuditFields
     @Mapping(target = "customer", expression = "java(mapCustomerId(source.getCustomerId()))")
-    @Mapping(target = "status", constant = "OPEN")
     @Mapping(target = "id" ,ignore = true)
     @Mapping(target = "assignedAgents" ,ignore = true)
     @Mapping(target = "priority" ,expression = "java(SupportTicket.PRIORITY.valueOf(source.getPriority().name()))")
+    @Mapping(target = "status" ,expression = "java(SupportTicket.STATUS.valueOf(source.getStatus().name()))")
     SupportTicket toEntity(SupportTicketDTO source);
     @Mapping(target = "customerId", expression = "java(source.getCustomer().getId())")
     @Mapping(target = "priority" ,expression = "java(SupportTicketDTO.PRIORITY.valueOf(source.getPriority().name()))")
+    @Mapping(target = "status" ,expression = "java(com.github.krashwani.assitflow.dto.TicketStatusDTO.STATUS.valueOf(source.getStatus().name()))")
     SupportTicketDTO toDto(SupportTicket source);
 
     // Helper method for mapping customerId to Customer

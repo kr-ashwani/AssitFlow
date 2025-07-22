@@ -3,6 +3,7 @@ package com.github.krashwani.assitflow.service.impl;
 import com.github.krashwani.assitflow.dto.PaginatedResponseDTO;
 import com.github.krashwani.assitflow.dto.SupportTicketDTO;
 import com.github.krashwani.assitflow.dto.TicketFilterRequestDTO;
+import com.github.krashwani.assitflow.dto.TicketStatusDTO;
 import com.github.krashwani.assitflow.entity.SupportTicket;
 import com.github.krashwani.assitflow.exception.apiError.BadRequestException;
 import com.github.krashwani.assitflow.mapper.PaginatedResponseMapper;
@@ -35,20 +36,23 @@ public class SupportTicketServiceImpl implements SupportTicketService {
     }
 
     @Transactional
+    @Override
     public String createTicket(SupportTicketDTO supportTicketDTO){
         SupportTicket supportTicket = supportTicketMapper.toEntity(supportTicketDTO);
         String customerId = supportTicket.getCustomer().getId();
         if(!customerRepository.existsById(customerId))
-            throw new BadRequestException(String.format("Failed to create ticket as customer with id %s is not registered.",customerId));
+            throw new BadRequestException(String.format("Failed to create ticket as customer with id '%s' is not registered.",customerId));
         supportTicketRepository.save(supportTicket);
         return supportTicket.getId();
     }
 
+    @Override
     public Optional<SupportTicketDTO> getTicketById(String ticketId){
         Optional<SupportTicket> supportTicket = supportTicketRepository.findById(ticketId);
         return supportTicket.map(supportTicketMapper::toDto);
     }
 
+    @Override
     public PaginatedResponseDTO<SupportTicketDTO> getAllTickets(TicketFilterRequestDTO ticketFilterRequestDTO){
         Sort sort = Sort.by(new Sort.Order(ticketFilterRequestDTO.getDirection(),ticketFilterRequestDTO.getSortBy()));
         PageRequest page = PageRequest.of(ticketFilterRequestDTO.getPage(),ticketFilterRequestDTO.getSize(),sort);
@@ -57,5 +61,14 @@ public class SupportTicketServiceImpl implements SupportTicketService {
 
         Page<SupportTicket> ticketsPage = supportTicketRepository.findAll(spec,page);
             return paginatedResponseMapper.convertPageToResponseDTO(ticketsPage,supportTicketMapper::toDto);
+    }
+
+    @Transactional
+    @Override
+    public void updateTicketStatus(String ticketId, TicketStatusDTO ticketStatusDTO){
+        SupportTicket supportTicket = supportTicketRepository.findById(ticketId).orElseThrow(
+                ()-> new BadRequestException(String.format("Ticket id '%s' is not present.",ticketId))
+        );
+        supportTicket.setStatus(SupportTicket.STATUS.valueOf(ticketStatusDTO.getStatus().name()));
     }
 }
