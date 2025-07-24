@@ -1,10 +1,11 @@
 package com.github.krashwani.assitflow.service.impl;
 
+import com.github.krashwani.assitflow.domain.enums.TicketStatus;
 import com.github.krashwani.assitflow.dto.PaginatedResponseDTO;
 import com.github.krashwani.assitflow.dto.SupportTicketDTO;
 import com.github.krashwani.assitflow.dto.TicketFilterRequestDTO;
 import com.github.krashwani.assitflow.dto.TicketStatusDTO;
-import com.github.krashwani.assitflow.entity.SupportTicket;
+import com.github.krashwani.assitflow.domain.model.SupportTicket;
 import com.github.krashwani.assitflow.exception.apiError.BadRequestException;
 import com.github.krashwani.assitflow.mapper.PaginatedResponseMapper;
 import com.github.krashwani.assitflow.mapper.SupportTicketMapper;
@@ -69,6 +70,6 @@ public class SupportTicketServiceImpl implements SupportTicketService {
         SupportTicket supportTicket = supportTicketRepository.findById(ticketId).orElseThrow(
                 ()-> new BadRequestException(String.format("Ticket id '%s' is not present.",ticketId))
         );
-        supportTicket.setStatus(SupportTicket.STATUS.valueOf(ticketStatusDTO.getStatus().name()));
+        supportTicket.setStatus(TicketStatus.valueOf(ticketStatusDTO.getStatus().name()));
     }
 }

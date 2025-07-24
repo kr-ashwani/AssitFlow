@@ -1,5 +1,7 @@
-package com.github.krashwani.assitflow.entity;
+package com.github.krashwani.assitflow.domain.model;
 
+import com.github.krashwani.assitflow.domain.enums.TicketPriority;
+import com.github.krashwani.assitflow.domain.enums.TicketStatus;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.HashSet;
@@ -24,10 +26,10 @@ public class SupportTicket extends Auditable {
     private String description;
     @Enumerated(EnumType.STRING)
     @Column(name = "ticket_status", nullable = false)
-    private STATUS status;
+    private TicketStatus status;
     @Enumerated(EnumType.STRING)
     @Column(name = "ticket_priority", nullable = false)
-    private PRIORITY priority;
+    private TicketPriority priority;
     @ElementCollection
     @CollectionTable(
             name = "t_ticket_tags",
@@ -43,11 +45,4 @@ public class SupportTicket extends Auditable {
     @OneToMany(mappedBy = "ticket")
     @ToString.Exclude
     private Set<TicketAssignment> assignedAgents = new HashSet<TicketAssignment>();
-
-    public enum STATUS{
-        OPEN,IN_PROGRESS,RESOLVED,CLOSED
-    }
-    public enum PRIORITY{
-        LOW,MEDIUM,HIGH
-    }
 }

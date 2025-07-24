@@ -1,6 +1,8 @@
 package com.github.krashwani.assitflow.dto;
 
 import com.github.krashwani.assitflow.annotation.validation.ValidEnum;
+import com.github.krashwani.assitflow.dto.enums.TicketDTOPriority;
+import com.github.krashwani.assitflow.dto.enums.TicketDTOStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -14,12 +16,6 @@ import org.springframework.data.domain.Sort;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TicketFilterRequestDTO {
-    public enum TicketStatus {
-        OPEN, PROGRESS, RESOLVED, CLOSED
-    }
-    public enum TicketPriority {
-        LOW,MEDIUM,HIGH
-    }
 
     @Min(value = 0, message = "Page number must be 0 or greater")
     private int page = 0;
@@ -27,11 +23,11 @@ public class TicketFilterRequestDTO {
     @Min(value = 1, message = "Page size must be at least 1")
     private int size = 10;
 
-    @ValidEnum(enumClass = TicketStatus.class,includeNull = true)
-    private TicketStatus status;
+    @ValidEnum(enumClass = TicketDTOStatus.class,includeNull = true)
+    private TicketDTOStatus status;
 
-    @ValidEnum(enumClass = TicketPriority.class,includeNull = true)
-    private TicketPriority priority;
+    @ValidEnum(enumClass = TicketDTOPriority.class,includeNull = true)
+    private TicketDTOPriority priority;
 
     @Pattern(regexp = "createdAt|updatedAt|priority|status|title",
             message = "Invalid sort field")

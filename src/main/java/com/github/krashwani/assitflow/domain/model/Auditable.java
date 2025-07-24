@@ -1,4 +1,4 @@
-package com.github.krashwani.assitflow.entity;
+package com.github.krashwani.assitflow.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

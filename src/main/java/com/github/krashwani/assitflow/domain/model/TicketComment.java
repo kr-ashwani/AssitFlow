@@ -1,11 +1,10 @@
-package com.github.krashwani.assitflow.entity;
+package com.github.krashwani.assitflow.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter

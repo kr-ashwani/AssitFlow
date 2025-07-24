@@ -1,6 +1,6 @@
 package com.github.krashwani.assitflow.repository;
 
-import com.github.krashwani.assitflow.entity.SupportTicket;
+import com.github.krashwani.assitflow.domain.model.SupportTicket;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;

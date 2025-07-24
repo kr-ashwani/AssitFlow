@@ -1,4 +1,4 @@
-package com.github.krashwani.assitflow.exception;
+package com.github.krashwani.assitflow.exception.enums;
 
 public enum ErrorCode {
     RESOURCE_NOT_FOUND,

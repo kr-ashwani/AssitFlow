@@ -1,7 +1,7 @@
 package com.github.krashwani.assitflow.exception.apiError;
 
 import com.github.krashwani.assitflow.exception.BaseAppException;
-import com.github.krashwani.assitflow.exception.ErrorCode;
+import com.github.krashwani.assitflow.exception.enums.ErrorCode;
 import org.springframework.http.HttpStatus;
 
 public class ApiException extends BaseAppException {

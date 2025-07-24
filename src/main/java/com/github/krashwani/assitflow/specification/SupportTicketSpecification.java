@@ -1,7 +1,11 @@
 package com.github.krashwani.assitflow.specification;
 
+import com.github.krashwani.assitflow.domain.enums.TicketPriority;
+import com.github.krashwani.assitflow.domain.enums.TicketStatus;
 import com.github.krashwani.assitflow.dto.TicketFilterRequestDTO;
-import com.github.krashwani.assitflow.entity.SupportTicket;
+import com.github.krashwani.assitflow.domain.model.SupportTicket;
+import com.github.krashwani.assitflow.dto.enums.TicketDTOPriority;
+import com.github.krashwani.assitflow.dto.enums.TicketDTOStatus;
 import org.springframework.data.jpa.domain.Specification;
 
 public class SupportTicketSpecification {
@@ -10,11 +14,11 @@ public class SupportTicketSpecification {
         return (base == null) ? addition : base.and(addition);
     }
 
-    private static Specification<SupportTicket> hasStatus(SupportTicket.STATUS status) {
+    private static Specification<SupportTicket> hasStatus(TicketStatus status) {
         return (root, query, cb) -> cb.equal(root.get("status"), status);
     }
 
-    private static Specification<SupportTicket> hasPriority(SupportTicket.PRIORITY priority) {
+    private static Specification<SupportTicket> hasPriority(TicketPriority priority) {
         return (root, query, cb) -> cb.equal(root.get("priority"), priority);
     }
 
@@ -22,27 +26,27 @@ public class SupportTicketSpecification {
         Specification<SupportTicket> spec = null;
 
         if (filter.getStatus() != null) {
-            SupportTicket.STATUS status = mapStatus(filter.getStatus());
+            TicketStatus status = mapStatus(filter.getStatus());
             spec = combine(spec, hasStatus(status));
         }
 
         if (filter.getPriority() != null) {
-            SupportTicket.PRIORITY priority = mapPriority(filter.getPriority());
+            TicketPriority priority = mapPriority(filter.getPriority());
             spec = combine(spec, hasPriority(priority));
         }
         return spec;
     }
 
-    private static SupportTicket.STATUS mapStatus(TicketFilterRequestDTO.TicketStatus dtoStatus) {
+    private static TicketStatus mapStatus(TicketDTOStatus dtoStatus) {
         return switch (dtoStatus) {
-            case OPEN -> SupportTicket.STATUS.OPEN;
-            case PROGRESS -> SupportTicket.STATUS.IN_PROGRESS;
-            case RESOLVED -> SupportTicket.STATUS.RESOLVED;
-            case CLOSED -> SupportTicket.STATUS.CLOSED;
+            case OPEN -> TicketStatus.OPEN;
+            case PROGRESS -> TicketStatus.PROGRESS;
+            case RESOLVED -> TicketStatus.RESOLVED;
+            case CLOSED -> TicketStatus.CLOSED;
         };
     }
 
-    private static SupportTicket.PRIORITY mapPriority(TicketFilterRequestDTO.TicketPriority dtoPriority) {
-        return SupportTicket.PRIORITY.valueOf(dtoPriority.name());
+    private static TicketPriority mapPriority(TicketDTOPriority dtoPriority) {
+        return TicketPriority.valueOf(dtoPriority.name());
     }
 }

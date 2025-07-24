@@ -1,6 +1,6 @@
 package com.github.krashwani.assitflow.payload;
 
-import com.github.krashwani.assitflow.exception.ErrorCode;
+import com.github.krashwani.assitflow.exception.enums.ErrorCode;
 import lombok.Builder;
 import lombok.Value;
 import java.time.Instant;

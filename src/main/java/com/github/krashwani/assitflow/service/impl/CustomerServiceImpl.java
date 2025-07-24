@@ -2,7 +2,7 @@ package com.github.krashwani.assitflow.service.impl;
 
 import com.github.krashwani.assitflow.dto.AddressDTO;
 import com.github.krashwani.assitflow.dto.CustomerDTO;
-import com.github.krashwani.assitflow.entity.Customer;
+import com.github.krashwani.assitflow.domain.model.Customer;
 import com.github.krashwani.assitflow.exception.apiError.BadRequestException;
 import com.github.krashwani.assitflow.mapper.AddressMapper;
 import com.github.krashwani.assitflow.mapper.CustomerMapper;

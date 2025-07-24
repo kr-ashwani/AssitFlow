@@ -3,10 +3,10 @@ package com.github.krashwani.assitflow.mapper;
 import com.github.krashwani.assitflow.dto.AgentRequestDTO;
 import com.github.krashwani.assitflow.dto.AgentResponseDTO;
 import com.github.krashwani.assitflow.dto.SupportTicketDTO;
-import com.github.krashwani.assitflow.entity.Agent;
-import com.github.krashwani.assitflow.entity.SupportTicket;
-import com.github.krashwani.assitflow.entity.TicketAssignment;
-import com.github.krashwani.assitflow.entity.TicketAssignmentId;
+import com.github.krashwani.assitflow.domain.model.Agent;
+import com.github.krashwani.assitflow.domain.model.SupportTicket;
+import com.github.krashwani.assitflow.domain.model.TicketAssignment;
+import com.github.krashwani.assitflow.domain.model.TicketAssignmentId;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

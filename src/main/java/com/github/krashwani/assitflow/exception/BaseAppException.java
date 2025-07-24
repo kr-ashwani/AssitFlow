@@ -1,5 +1,7 @@
 package com.github.krashwani.assitflow.exception;
 
+import com.github.krashwani.assitflow.exception.enums.ErrorCode;
+
 public abstract class BaseAppException extends RuntimeException implements AppException {
 
     private final ErrorCode errorCode;

@@ -1,38 +1,42 @@
-package com.github.krashwani.assitflow.entity;
+package com.github.krashwani.assitflow.domain.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
-@Table(name = "t_customer")
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@DynamicUpdate
-public class Customer extends Auditable{
+@Table(
+        name = "t_agent"
+)
+public class Agent extends Auditable{
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "customer_id", nullable = false)
+    @Column(name = "agent_id", nullable = false)
     private String id;
-
-    @Column(name = "customer_name", nullable = false)
+    @Column(name = "agent_name", nullable = false)
     private String name;
-    @Column(name = "customer_email", nullable = false, unique = true)
+    @Column(name = "agent_email", nullable = false, unique = true)
     private String email;
-    @Column(name = "customer_phone", nullable = false)
-    private String phone;
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "customer_address_id",nullable = false,referencedColumnName = "address_id")
+    @OneToMany(mappedBy = "agent")
     @ToString.Exclude
-    private Address address;
+    private Set<TicketAssignment> assignedTickets = new HashSet<TicketAssignment>();
+    @ElementCollection
+    @CollectionTable(
+            name = "t_agent_skills",
+            joinColumns = @JoinColumn(name = "agent_id")
+    )
+    private Set<String> skills = new HashSet<String>();
 
     @Override
     public final boolean equals(Object o) {
@@ -41,8 +45,8 @@ public class Customer extends Auditable{
         Class<?> oEffectiveClass = o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        Customer customer = (Customer) o;
-        return getId() != null && Objects.equals(getId(), customer.getId());
+        Agent agent = (Agent) o;
+        return getId() != null && Objects.equals(getId(), agent.getId());
     }
 
     @Override
