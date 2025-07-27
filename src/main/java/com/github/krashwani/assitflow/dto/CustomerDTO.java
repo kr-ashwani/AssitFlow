@@ -6,17 +6,14 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class  CustomerDTO {
-    @NotBlank(message = "Customer name cannot be null/blank")
-    private String name;
-    @NotBlank(message = "Customer email cannot be null/blank")
-    @Email
-    private String email;
+public class  CustomerDTO extends UserDTO {
     @NotBlank(message = "Customer phone cannot be null/blank")
     @Pattern(regexp = "^(\\+91[\\-\\s]?)?[6-9]\\d{9}$", message = "Invalid phone number")
     private String phone;

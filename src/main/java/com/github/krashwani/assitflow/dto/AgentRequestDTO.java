@@ -2,31 +2,22 @@ package com.github.krashwani.assitflow.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AgentRequestDTO {
-
-    @NotBlank(message = "Agent name cannot be null/blank")
-    private String name;
-
-    @NotBlank(message = "Agent email cannot be null/blank")
-    @Email
-    private String email;
+public class AgentRequestDTO extends UserDTO {
 
     private Set<String> skills = new HashSet<>();
-
     private List<String> assignedTicketIds = new ArrayList<>();
 }
 
