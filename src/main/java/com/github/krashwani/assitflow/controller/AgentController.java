@@ -2,10 +2,13 @@ package com.github.krashwani.assitflow.controller;
 
 import com.github.krashwani.assitflow.dto.AgentRequestDTO;
 import com.github.krashwani.assitflow.dto.AgentResponseDTO;
+import com.github.krashwani.assitflow.dto.SupportTicketDTO;
 import com.github.krashwani.assitflow.payload.ApiResponse;
 import com.github.krashwani.assitflow.service.AgentService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/agents")
@@ -24,9 +27,9 @@ public class AgentController {
     }
 
     @GetMapping("/{agentId}/tickets")
-    ApiResponse<AgentResponseDTO> getAllAssignedTicketsToAgent(@PathVariable String agentId){
-        AgentResponseDTO allTicketsAssignedToAgent = agentService.getAllTicketsAssignedToAgent(agentId);
-        return ApiResponse.success(allTicketsAssignedToAgent,"All assigned tickets are fetched successfully!");
+    ApiResponse<List<SupportTicketDTO>> getAllAssignedTicketsToAgent(@PathVariable String agentId){
+        List<SupportTicketDTO> supportTicketDTOs = agentService.getAllTicketsAssignedToAgent(agentId);
+        return ApiResponse.success(supportTicketDTOs,"All assigned tickets are fetched successfully!");
     }
 
     @PostMapping("/{agentId}/assign-ticket/{ticketId}")

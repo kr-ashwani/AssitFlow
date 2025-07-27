@@ -1,4 +1,4 @@
-package com.github.krashwani.assitflow.exception;
+package com.github.krashwani.assitflow.exception.core;
 
 import com.github.krashwani.assitflow.exception.enums.ErrorCode;
 
@@ -25,5 +25,11 @@ public abstract class BaseAppException extends RuntimeException implements AppEx
     public Throwable getCause() {
         return super.getCause();
     }
+
+    @Override
+    public String toString() {
+        return "Exception[" + errorCode + "]: " + getMessage();
+    }
+
 }
 

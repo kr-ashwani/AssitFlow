@@ -4,6 +4,7 @@ import com.github.krashwani.assitflow.dto.AddressDTO;
 import com.github.krashwani.assitflow.dto.CustomerDTO;
 import com.github.krashwani.assitflow.domain.model.Customer;
 import com.github.krashwani.assitflow.exception.apiError.BadRequestException;
+import com.github.krashwani.assitflow.exception.domain.CustomerNotFoundException;
 import com.github.krashwani.assitflow.mapper.AddressMapper;
 import com.github.krashwani.assitflow.mapper.CustomerMapper;
 import com.github.krashwani.assitflow.repository.CustomerRepository;
@@ -44,7 +45,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public void updateCustomerAddress(String customerId, AddressDTO addressDTO){
         Customer customer = customerRepository.findById(customerId).orElseThrow(
-                ()->new BadRequestException(String.format("Customer id '%s' is not registered",customerId)
+                ()->new CustomerNotFoundException(String.format("Customer id '%s' is not registered",customerId)
         ));
         customer.getAddress().setCurrent(false);
         customer.setAddress(addressMapper.toEntity(addressDTO));

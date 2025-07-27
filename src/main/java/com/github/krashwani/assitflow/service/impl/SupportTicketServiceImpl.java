@@ -7,6 +7,8 @@ import com.github.krashwani.assitflow.dto.TicketFilterRequestDTO;
 import com.github.krashwani.assitflow.dto.TicketStatusDTO;
 import com.github.krashwani.assitflow.domain.model.SupportTicket;
 import com.github.krashwani.assitflow.exception.apiError.BadRequestException;
+import com.github.krashwani.assitflow.exception.domain.CustomerNotFoundException;
+import com.github.krashwani.assitflow.exception.domain.TicketNotFoundException;
 import com.github.krashwani.assitflow.mapper.PaginatedResponseMapper;
 import com.github.krashwani.assitflow.mapper.SupportTicketMapper;
 import com.github.krashwani.assitflow.repository.CustomerRepository;
@@ -42,7 +44,7 @@ public class SupportTicketServiceImpl implements SupportTicketService {
         SupportTicket supportTicket = supportTicketMapper.toEntity(supportTicketDTO);
         String customerId = supportTicket.getCustomer().getId();
         if(!customerRepository.existsById(customerId))
-            throw new BadRequestException(String.format("Failed to create ticket as customer with id '%s' is not registered.",customerId));
+            throw new CustomerNotFoundException(String.format("Failed to create ticket as customer with id '%s' is not registered.",customerId));
         supportTicketRepository.save(supportTicket);
         return supportTicket.getId();
     }
@@ -68,7 +70,7 @@ public class SupportTicketServiceImpl implements SupportTicketService {
     @Override
     public void updateTicketStatus(String ticketId, TicketStatusDTO ticketStatusDTO){
         SupportTicket supportTicket = supportTicketRepository.findById(ticketId).orElseThrow(
-                ()-> new BadRequestException(String.format("Ticket id '%s' is not present.",ticketId))
+                ()-> new TicketNotFoundException(String.format("Ticket id '%s' is not present.",ticketId))
         );
         supportTicket.setStatus(TicketStatus.valueOf(ticketStatusDTO.getStatus().name()));
     }

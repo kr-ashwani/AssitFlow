@@ -5,6 +5,7 @@ import com.github.krashwani.assitflow.dto.SupportTicketDTO;
 import com.github.krashwani.assitflow.dto.TicketFilterRequestDTO;
 import com.github.krashwani.assitflow.dto.TicketStatusDTO;
 import com.github.krashwani.assitflow.exception.apiError.BadRequestException;
+import com.github.krashwani.assitflow.exception.domain.TicketNotFoundException;
 import com.github.krashwani.assitflow.payload.ApiResponse;
 import com.github.krashwani.assitflow.service.SupportTicketService;
 import jakarta.validation.Valid;
@@ -28,7 +29,7 @@ public class SupportTicketController {
     @GetMapping("/{ticketId}")
     ApiResponse<SupportTicketDTO> getCustomerById(@PathVariable String ticketId){
         SupportTicketDTO supportTicketDTO = supportTicketService.getTicketById(ticketId).orElseThrow(
-                ()-> new BadRequestException(String.format("Ticket id '%s' is not present.",ticketId))
+                ()-> new TicketNotFoundException(String.format("Ticket id '%s' is not present.",ticketId))
         );
         return ApiResponse.success(supportTicketDTO,"Ticket is fetched successfully!");
     }

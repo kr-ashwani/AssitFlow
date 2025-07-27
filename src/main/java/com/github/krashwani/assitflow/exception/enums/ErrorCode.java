@@ -9,5 +9,6 @@ public enum ErrorCode {
     ACCESS_DENIED,
     UNAUTHORIZED,
     NOT_FOUND,
-    CONFLICT
+    CONFLICT,
+    ASSIGNMENT_FAILURE
 }

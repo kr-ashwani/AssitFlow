@@ -19,8 +19,6 @@ import java.util.Set;
 @Mapper(componentModel = "spring", uses = {SupportTicketMapper.class})
 public interface AgentMapper {
 
-    @Mapping(target = "assignedTicketCount", expression = "java(agent.getAssignedTickets().size())")
-    @Mapping(target = "assignedTickets", expression = "java(mapTickets(agent))")
     AgentResponseDTO toResponseDto(Agent agent);
 
     @Mapping(target = "assignedTickets", expression = "java(mapAssignments(agentRequestDTO))")
@@ -51,7 +49,6 @@ public interface AgentMapper {
         }
         return assignments;
     }
-
 
     SupportTicketDTO mapTicket(SupportTicket ticket);
 }

@@ -3,6 +3,7 @@ package com.github.krashwani.assitflow.controller;
 import com.github.krashwani.assitflow.dto.AddressDTO;
 import com.github.krashwani.assitflow.dto.CustomerDTO;
 import com.github.krashwani.assitflow.exception.apiError.BadRequestException;
+import com.github.krashwani.assitflow.exception.domain.CustomerNotFoundException;
 import com.github.krashwani.assitflow.payload.ApiResponse;
 import com.github.krashwani.assitflow.service.CustomerService;
 import jakarta.validation.Valid;
@@ -27,7 +28,7 @@ public class CustomerController {
     @GetMapping("/{customerId}")
     ApiResponse<CustomerDTO> getCustomerById(@PathVariable String customerId){
         CustomerDTO customerDTO = customerService.getCustomerById(customerId).orElseThrow(
-                ()-> new BadRequestException(String.format("Customer id '%s' is not registered.",customerId))
+                ()-> new CustomerNotFoundException(String.format("Customer id '%s' is not registered.",customerId))
         );
         return ApiResponse.success(customerDTO,"Customer is fetched successfully!");
     }

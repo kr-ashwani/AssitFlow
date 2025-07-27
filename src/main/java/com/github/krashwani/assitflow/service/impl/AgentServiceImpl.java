@@ -6,23 +6,30 @@ import com.github.krashwani.assitflow.domain.model.Agent;
 import com.github.krashwani.assitflow.domain.model.SupportTicket;
 import com.github.krashwani.assitflow.domain.model.TicketAssignment;
 import com.github.krashwani.assitflow.domain.model.TicketAssignmentId;
-import com.github.krashwani.assitflow.exception.apiError.BadRequestException;
+import com.github.krashwani.assitflow.dto.SupportTicketDTO;
+import com.github.krashwani.assitflow.exception.domain.AgentNotFoundException;
+import com.github.krashwani.assitflow.exception.domain.TicketNotFoundException;
 import com.github.krashwani.assitflow.mapper.AgentMapper;
+import com.github.krashwani.assitflow.mapper.SupportTicketMapper;
 import com.github.krashwani.assitflow.repository.AgentRepository;
 import com.github.krashwani.assitflow.repository.SupportTicketRepository;
 import com.github.krashwani.assitflow.repository.TicketAssignmentRepository;
 import com.github.krashwani.assitflow.service.AgentService;
 
-import com.github.krashwani.assitflow.service.strategy.assignment.AgentAssignmentStrategy;
-import com.github.krashwani.assitflow.service.strategy.assignment.AgentAssignmentStrategyFactory;
-import com.github.krashwani.assitflow.service.strategy.assignment.enums.AgentAssignmentStrategyType;
-import com.github.krashwani.assitflow.service.strategy.assignment.StrategyDecisionResolver;
+import com.github.krashwani.assitflow.specification.AgentSpecification;
+import com.github.krashwani.assitflow.strategy.assignment.AgentAssignmentStrategy;
+import com.github.krashwani.assitflow.strategy.assignment.AgentAssignmentStrategyFactory;
+import com.github.krashwani.assitflow.strategy.assignment.enums.AgentAssignmentStrategyType;
+import com.github.krashwani.assitflow.strategy.assignment.StrategyDecisionResolver;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -31,14 +38,16 @@ public class AgentServiceImpl implements AgentService {
 
     private final AgentRepository agentRepository;
     private final AgentMapper agentMapper;
+    private final SupportTicketMapper supportTicketMapper;
     private final TicketAssignmentRepository ticketAssignmentRepository;
     private final SupportTicketRepository supportTicketRepository;
     private final AgentAssignmentStrategyFactory strategyFactory;
     private final StrategyDecisionResolver strategyResolver;
 
-    public AgentServiceImpl(AgentRepository agentRepository, AgentMapper agentMapper, TicketAssignmentRepository ticketAssignmentRepository, SupportTicketRepository supportTicketRepository, AgentAssignmentStrategyFactory strategyFactory, StrategyDecisionResolver strategyResolver) {
+    public AgentServiceImpl(AgentRepository agentRepository, AgentMapper agentMapper, SupportTicketMapper supportTicketMapper, TicketAssignmentRepository ticketAssignmentRepository, SupportTicketRepository supportTicketRepository, AgentAssignmentStrategyFactory strategyFactory, StrategyDecisionResolver strategyResolver) {
         this.agentRepository = agentRepository;
         this.agentMapper = agentMapper;
+        this.supportTicketMapper = supportTicketMapper;
         this.ticketAssignmentRepository = ticketAssignmentRepository;
         this.supportTicketRepository = supportTicketRepository;
         this.strategyFactory = strategyFactory;
@@ -72,12 +81,17 @@ public class AgentServiceImpl implements AgentService {
     }
 
     @Override
-    public AgentResponseDTO getAllTicketsAssignedToAgent(String agentId) {
-        Agent agent = agentRepository.findById(agentId)
-                .orElseThrow(() -> new BadRequestException(
-                        String.format("Agent ID '%s' is not registered.", agentId)));
+    public Optional<AgentResponseDTO> getAgentById(String agentId) {
+        return agentRepository.findById(agentId).map(agentMapper::toResponseDto);
+    }
 
-        return agentMapper.toResponseDto(agent);
+    @Override
+    public List<SupportTicketDTO> getAllTicketsAssignedToAgent(String agentId) {
+        List<SupportTicket> ticketsAssignedToAgent = supportTicketRepository.findTicketsAssignedToAgent(agentId);
+
+        return ticketsAssignedToAgent.stream()
+                .map(supportTicketMapper::toDto)
+                .toList();
     }
 
     @Transactional
@@ -90,9 +104,9 @@ public class AgentServiceImpl implements AgentService {
         }
 
         Agent agent = agentRepository.findById(agentId)
-                .orElseThrow(() -> new BadRequestException("Invalid agent ID: " + agentId));
+                .orElseThrow(() -> new AgentNotFoundException("Invalid agent ID: " + agentId));
         SupportTicket ticket = supportTicketRepository.findById(ticketId)
-                .orElseThrow(() -> new BadRequestException("Invalid ticket ID: " + ticketId));
+                .orElseThrow(() -> new TicketNotFoundException("Invalid ticket ID: " + ticketId));
 
         TicketAssignment assignment = new TicketAssignment();
         assignment.setTicket(ticket);
@@ -111,7 +125,7 @@ public class AgentServiceImpl implements AgentService {
         log.info("Auto-assigning ticket: {}", ticketId);
 
         SupportTicket ticket = supportTicketRepository.findById(ticketId)
-                .orElseThrow(() -> new BadRequestException("Ticket not found with ID: " + ticketId));
+                .orElseThrow(() -> new TicketNotFoundException("Ticket not found with ID: " + ticketId));
 
         AgentAssignmentStrategyType strategyType = strategyResolver.resolveStrategyType(ticket);
         log.info("Resolved strategy: {} for ticket {}", strategyType, ticketId);
@@ -124,4 +138,22 @@ public class AgentServiceImpl implements AgentService {
 
         return agentId;
     }
+
+    @Override
+    public List<AgentResponseDTO> findAgentsWithAnyMatchingSkills( List<String> skills){
+        return agentRepository.findAgentsWithAnyMatchingSkills(skills)
+                .stream()
+                .map(agentMapper::toResponseDto)
+                .toList();
+    }
+
+    @Override
+    public List<AgentResponseDTO> findAgentsWithAllMatchingSkills( List<String> skills){
+        Specification<Agent> allSkillAgentSpecification = AgentSpecification.hasAllSkills(new HashSet<>(skills));
+        return agentRepository.findAll(allSkillAgentSpecification)
+                .stream()
+                .map(agentMapper::toResponseDto)
+                .toList();
+    }
+
 }

@@ -1,9 +1,9 @@
-package com.github.krashwani.assitflow.service.strategy.assignment.impl;
+package com.github.krashwani.assitflow.strategy.assignment.impl;
 
 import com.github.krashwani.assitflow.domain.model.Agent;
 import com.github.krashwani.assitflow.repository.AgentRepository;
-import com.github.krashwani.assitflow.service.strategy.assignment.AgentAssignmentStrategy;
-import com.github.krashwani.assitflow.service.strategy.assignment.enums.AgentAssignmentStrategyType;
+import com.github.krashwani.assitflow.strategy.assignment.AgentAssignmentStrategy;
+import com.github.krashwani.assitflow.strategy.assignment.enums.AgentAssignmentStrategyType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

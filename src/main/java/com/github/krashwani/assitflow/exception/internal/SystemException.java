@@ -1,6 +1,6 @@
 package com.github.krashwani.assitflow.exception.internal;
 
-import com.github.krashwani.assitflow.exception.BaseAppException;
+import com.github.krashwani.assitflow.exception.core.BaseAppException;
 import com.github.krashwani.assitflow.exception.enums.ErrorCode;
 
 public class SystemException extends BaseAppException {

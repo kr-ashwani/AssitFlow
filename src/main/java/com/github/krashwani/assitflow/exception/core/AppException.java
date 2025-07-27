@@ -1,4 +1,4 @@
-package com.github.krashwani.assitflow.exception;
+package com.github.krashwani.assitflow.exception.core;
 
 import com.github.krashwani.assitflow.exception.enums.ErrorCode;
 

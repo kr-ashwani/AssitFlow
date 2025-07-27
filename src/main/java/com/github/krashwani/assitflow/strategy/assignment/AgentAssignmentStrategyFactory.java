@@ -1,7 +1,7 @@
-package com.github.krashwani.assitflow.service.strategy.assignment;
+package com.github.krashwani.assitflow.strategy.assignment;
 
 
-import com.github.krashwani.assitflow.service.strategy.assignment.enums.AgentAssignmentStrategyType;
+import com.github.krashwani.assitflow.strategy.assignment.enums.AgentAssignmentStrategyType;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;

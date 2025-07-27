@@ -1,7 +1,8 @@
-package com.github.krashwani.assitflow.exception;
+package com.github.krashwani.assitflow.exception.core;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import com.github.krashwani.assitflow.exception.apiError.ApiException;
 import com.github.krashwani.assitflow.exception.apiError.BadRequestException;
 import com.github.krashwani.assitflow.exception.apiError.ResourceNotFoundException;
 import com.github.krashwani.assitflow.exception.enums.ErrorCode;
@@ -46,6 +47,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Object>> handleBadRequest(BadRequestException ex) {
         log.warn("Bad request: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                ApiResponse.failure(ex.getErrorCode(), ex.getMessage())
+        );
+    }
+
+    @ExceptionHandler(ApiException.class)
+    public ResponseEntity<ApiResponse<Object>> handleApiError(ApiException ex) {
+        log.warn("Api exception: {}", ex.getMessage());
+        return ResponseEntity.status(ex.getHttpStatus()).body(
                 ApiResponse.failure(ex.getErrorCode(), ex.getMessage())
         );
     }
