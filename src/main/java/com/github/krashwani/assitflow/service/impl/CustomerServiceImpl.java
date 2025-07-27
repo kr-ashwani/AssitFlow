@@ -1,5 +1,6 @@
 package com.github.krashwani.assitflow.service.impl;
 
+import com.github.krashwani.assitflow.domain.enums.UserRole;
 import com.github.krashwani.assitflow.dto.AddressDTO;
 import com.github.krashwani.assitflow.dto.CustomerDTO;
 import com.github.krashwani.assitflow.domain.model.Customer;
@@ -30,6 +31,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public String createCustomer(CustomerDTO customerDTO){
         Customer customer = customerMapper.toEntity(customerDTO);
+        customer.setRole(UserRole.CUSTOMER);
         customerRepository.save(customer);
         return customer.getId();
     }

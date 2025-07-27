@@ -17,6 +17,10 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Agent extends User{
+
+    @Column(name = "agent_phone", nullable = false)
+    private String phone;
+
     @OneToMany(mappedBy = "agent")
     @ToString.Exclude
     private Set<TicketAssignment> assignedTickets = new HashSet<TicketAssignment>();

@@ -1,5 +1,6 @@
 package com.github.krashwani.assitflow.domain.model;
 
+import com.github.krashwani.assitflow.domain.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,4 +22,9 @@ public class User extends Auditable{
     private String name;
     @Column(name = "user_email", nullable = false, unique = true)
     private String email;
+
+    @Column(name = "user_role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
 }

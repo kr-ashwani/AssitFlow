@@ -1,5 +1,6 @@
 package com.github.krashwani.assitflow.service.impl;
 
+import com.github.krashwani.assitflow.domain.enums.UserRole;
 import com.github.krashwani.assitflow.dto.AgentRequestDTO;
 import com.github.krashwani.assitflow.dto.AgentResponseDTO;
 import com.github.krashwani.assitflow.domain.model.Agent;
@@ -61,6 +62,7 @@ public class AgentServiceImpl implements AgentService {
         log.info("Creating new agent with details: {}", agentRequestDTO);
 
         Agent agent = agentMapper.toEntity(agentRequestDTO);
+        agent.setRole(UserRole.AGENT);
         Agent savedAgent = agentRepository.save(agent);
         log.info("Agent saved with ID: {}", savedAgent.getId());
 
